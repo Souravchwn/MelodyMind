@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test - MelodyMind</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8">
+                <i class="fas fa-flask mr-2 text-blue-500"></i>
+                MelodyMind API Test
+            </h1>
+            
+            <!-- Test Form -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Test Lyrics & Chords APIs</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Artist</label>
+                        <input type="text" id="artist" value="Ed Sheeran" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Song Title</label>
+                        <input type="text" id="title" value="Shape of You" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="testLyrics()" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition duration-200">
+                        <i class="fas fa-quote-left mr-2"></i>Test Lyrics
+                    </button>
+                    <button onclick="testChords()" 
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md transition duration-200">
+                        <i class="fas fa-music mr-2"></i>Test Chords
+                    </button>
+                    <button onclick="testAsync()" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition duration-200">
+                        <i class="fas fa-sync mr-2"></i>Test Async Both
+                    </button>
+                    <button onclick="testThreadInfo()" 
+                            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition duration-200">
+                        <i class="fas fa-info-circle mr-2"></i>Thread Info
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden text-center py-4">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <p class="mt-2 text-gray-600">Testing API...</p>
+            </div>
+            
+            <!-- Results -->
+            <div id="results" class="space-y-6">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').classList.remove('hidden');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loading').classList.add('hidden');
+        }
+        
+        function displayResult(title, data, type = 'success') {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const resultHtml = `
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900">${title}</h3>
+                        <span class="text-sm text-gray-500">${timestamp}</span>
+                    </div>
+                    <div class="bg-gray-50 rounded-md p-4">
+                        <pre class="whitespace-pre-wrap text-sm text-gray-800">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.insertAdjacentHTML('afterbegin', resultHtml);
+        }
+        
+        async function testLyrics() {
+            const artist = document.getElementById('artist').value;
+            const title = document.getElementById('title').value;
+            
+            if (!artist || !title) {
+                alert('Please enter both artist and title');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`/api/test/lyrics?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+                const data = await response.json();
+                
+                displayResult(`Lyrics Test: ${title} by ${artist}`, data);
+            } catch (error) {
+                displayResult('Lyrics Test Error', { error: error.message }, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function testChords() {
+            const artist = document.getElementById('artist').value;
+            const title = document.getElementById('title').value;
+            
+            if (!artist || !title) {
+                alert('Please enter both artist and title');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const response = await fetch(`/api/test/chords?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+                const data = await response.json();
+                
+                displayResult(`Chords Test: ${title} by ${artist}`, data);
+            } catch (error) {
+                displayResult('Chords Test Error', { error: error.message }, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function testAsync() {
+            const artist = document.getElementById('artist').value;
+            const title = document.getElementById('title').value;
+            
+            if (!artist || !title) {
+                alert('Please enter both artist and title');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(`/api/test/async-test?artist=${encodeURIComponent(artist)}&title=${encodeURIComponent(title)}`);
+                const data = await response.json();
+                const endTime = Date.now();
+                
+                data.executionTime = `${endTime - startTime}ms`;
+                
+                displayResult(`Async Test: ${title} by ${artist}`, data);
+            } catch (error) {
+                displayResult('Async Test Error', { error: error.message }, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function testThreadInfo() {
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/test/thread-info');
+                const data = await response.json();
+                
+                displayResult('Thread Information', data);
+            } catch (error) {
+                displayResult('Thread Info Error', { error: error.message }, 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        // Add some sample songs for quick testing
+        const sampleSongs = [
+            { artist: 'Ed Sheeran', title: 'Shape of You' },
+            { artist: 'The Weeknd', title: 'Blinding Lights' },
+            { artist: 'Queen', title: 'Bohemian Rhapsody' },
+            { artist: 'Taylor Swift', title: 'Anti-Hero' },
+            { artist: 'Eagles', title: 'Hotel California' }
+        ];
+        
+        // Add quick select buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.bg-white.rounded-lg.shadow-lg');
+            const quickSelectHtml = `
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <p class="text-sm font-medium text-gray-700 mb-2">Quick Select:</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${sampleSongs.map(song => 
+                            `<button onclick="selectSong('${song.artist}', '${song.title}')" 
+                                     class="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition duration-200">
+                                ${song.title} - ${song.artist}
+                             </button>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+            form.insertAdjacentHTML('beforeend', quickSelectHtml);
+        });
+        
+        function selectSong(artist, title) {
+            document.getElementById('artist').value = artist;
+            document.getElementById('title').value = title;
+        }
+    </script>
+</body>
+</html>

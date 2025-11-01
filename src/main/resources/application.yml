@@ -1,0 +1,103 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: melodymind
+  web:
+    resources:
+      static-locations: classpath:/static/
+      cache:
+        cachecontrol:
+          max-age: 3600
+
+
+  # H2 Database Configuration
+  datasource:
+    url: jdbc:h2:mem:melodymind
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+  # Cache Configuration
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=30m
+
+# Logging Configuration
+logging:
+  level:
+    com.sourav.melodymind: INFO
+    com.sourav.melodymind.service.impl.LyricsServiceImpl: DEBUG
+    com.sourav.melodymind.service.impl.ChordsServiceImpl: DEBUG
+    com.sourav.melodymind.provider: DEBUG
+    org.springframework.web: INFO
+    org.springframework.cache: INFO
+    reactor.netty.http.client: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%15.15thread] %-5level %logger{40} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/melodymind.log
+    max-size: 10MB
+    max-history: 30
+
+# Custom Application Properties
+melodymind:
+  cache:
+    refresh-interval: 300000 # 5 minutes in milliseconds
+  api:
+    timeout: 5000 # 5 seconds
+    retry-attempts: 3
+  
+  # Scheduler Configuration
+  scheduler:
+    enabled: true
+    daily-cleanup-time: "0 0 0 * * ?" # 12:00 AM daily
+    trending-refresh-interval: 21600000 # 6 hours in milliseconds
+    old-data-retention-days: 7 # Keep data for 7 days
+    batch-size: 100 # Batch size for database operations
+    preload-limit: 10 # Number of songs to preload per combination
+  
+  # Music Provider Configurations
+  providers:
+    spotify:
+      enabled: true
+      client-id: ${SPOTIFY_CLIENT_ID:your_spotify_client_id_here}
+      client-secret: ${SPOTIFY_CLIENT_SECRET:your_spotify_client_secret_here}
+      base-url: https://api.spotify.com/v1
+      timeout: 5000
+      retry-attempts: 3
+    
+    lastfm:
+      enabled: true
+      api-key: ${LASTFM_API_KEY:your_lastfm_api_key_here}
+      base-url: https://ws.audioscrobbler.com/2.0
+      timeout: 5000
+      retry-attempts: 3
+    
+    deezer:
+      enabled: true
+      base-url: https://api.deezer.com
+      timeout: 5000
+      retry-attempts: 3
+    
+    lyrics:
+      enabled: true
+      lyrics-ovh-url: https://api.lyrics.ovh/v1
+      genius-api-key: ${GENIUS_API_KEY:your_genius_api_key_here}
+      genius-base-url: https://api.genius.com
+      timeout: 5000
+      retry-attempts: 3
