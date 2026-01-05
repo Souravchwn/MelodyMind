@@ -13,5 +13,5 @@
 
 * **Mood-Based Recommendations:** Users select a mood (e.g., 'focus', 'chill') to receive contextually relevant music.
 * **Localized Trending Data:** Allows users to select a country for localized, real-time trending music updates.
-* **Scheduled Refresh:** A background scheduler periodically refreshes the cache to keep data current, with an **Offline Fallback** for high availability.
+* **Scheduled Refresh:** A background scheduler periodically refreshes the cache to keep data current, with an Offline Fallback for high availability.
 * **Simple Static Dashboard:** Exposes clean REST endpoints consumed by a static HTML/JS interface for a seamless, developer-friendly UI experience.
