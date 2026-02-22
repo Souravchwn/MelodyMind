@@ -16,8 +16,7 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        
-        // Configure different caches with different expiration times
+
         cacheManager.registerCustomCache("recommendations", 
             Caffeine.newBuilder()
                 .initialCapacity(50)
